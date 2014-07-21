@@ -2,3 +2,7 @@ target/
 .classpath
 .project
 node_modules
+
+# Haskell
+cabal-dev/
+dist/
