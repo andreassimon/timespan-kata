@@ -6,3 +6,7 @@ node_modules
 # Haskell
 cabal-dev/
 dist/
+
+*.hi
+*.o
+timespan
