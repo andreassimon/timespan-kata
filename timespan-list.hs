@@ -44,9 +44,15 @@ test_2_3 =
         prettyPrintBriefly ts = prettyPrint $ take 3 ts
 
 test_3_1 =
-     do assertEqual "2 days" (prettyPrintBriefly $ simplify (Seconds 172862))
+     do assertEqual "2 days" (prettyPrintLossy $ simplify (Seconds 172862))
      where
-        prettyPrintBriefly ts = prettyPrint $ take 1 ts
+        prettyPrintLossy ts = prettyPrint $ take 1 ts
+
+test_3_2 =
+     do assertEqual "2 days" (prettyPrintLossy $ simplify (Seconds 198719))
+        assertEqual "3 days" (prettyPrintLossy $ simplify (Seconds 233280))
+     where
+        prettyPrintLossy ts = prettyPrint $ Main.round $ take 2 ts
 
 data Timespan = Seconds Integer |
                 Minutes Integer |
@@ -99,6 +105,12 @@ simplifyL [(Seconds seconds)]
   | seconds < 60 = [(Seconds seconds)]
   | otherwise    = simplifyL [(Minutes (seconds `div` 60)), (Seconds (seconds `mod` 60))]
 simplifyL ts     = ts
+
+round :: [Timespan] -> [Timespan]
+round [(Days d), (Hours h)]
+  | h < 12 = [(Days d)]
+  | otherwise = [(Days (d+1))]
+round ts = ts
 
 
 main =
