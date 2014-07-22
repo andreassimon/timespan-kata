@@ -27,9 +27,9 @@ test_1_3_months =
 test_1_3_years =
     do assertEqual "2 years, 2 months, 2 days, 2 hours, 2 minutes, 2 seconds" (prettyPrint $ simplify $ (Seconds (2*12*30*24*60*60 + 2*30*24*60*60 + 2*24*60*60 + 2*60*60 + 2*60 + 2)))
 
--- test_1_4 =
---      do assertEqual "1 second" (prettyPrint BriefForm $ 1)
---         assertEqual "1 day, 1 hour" (prettyPrint BriefForm $ 90012)
+test_2_1 =
+     do assertEqual "1 second" (prettyPrintBriefly $ simplify (Seconds 1))
+        assertEqual "1 day, 1 hour" (prettyPrintBriefly $ simplify (Seconds 90012))
 
 data Timespan = Seconds Integer |
                 Minutes Integer |
@@ -49,6 +49,18 @@ instance Show Timespan where
   show (Days d)    = showTimespan "day" d
   show (Months m)  = showTimespan "month" m
   show (Years y)   = showTimespan "year" y
+
+timespanNotZero :: Timespan -> Bool
+timespanNotZero (Seconds 0) = False
+timespanNotZero (Minutes 0) = False
+timespanNotZero (Hours 0)   = False
+timespanNotZero (Days 0)    = False
+timespanNotZero (Months 0)  = False
+timespanNotZero (Years 0)   = False
+timespanNotZero _           = True
+
+prettyPrintBriefly :: [Timespan] -> String
+prettyPrintBriefly ts = prettyPrint $ filter timespanNotZero $ take 3 ts
 
 prettyPrint :: [Timespan] -> String
 prettyPrint ts = foldl1 (\x y -> concat [x,", ",y]) $ map show ts
