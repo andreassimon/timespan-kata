@@ -38,6 +38,11 @@ test_2_2 =
      where
         prettyPrintBriefly ts = prettyPrint $ take 3 ts
 
+test_2_3 =
+     do assertEqual "2 days, 0 hours, 1 minute" (prettyPrintBriefly $ simplify (Seconds 172860))
+     where
+        prettyPrintBriefly ts = prettyPrint $ take 3 ts
+
 data Timespan = Seconds Integer |
                 Minutes Integer |
                 Hours Integer   |
