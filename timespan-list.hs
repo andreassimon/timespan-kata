@@ -49,9 +49,31 @@ test_3_1 =
         prettyPrintLossy ts = prettyPrint $ take 1 ts
 
 test_3_2 =
-     do assertEqual "2 days" (prettyPrintLossy $ simplify (Seconds 198719))
+     do assertEqual "1 second" (prettyPrintLossy $ simplify (Seconds (1*second)))
+        assertEqual "2 seconds" (prettyPrintLossy $ simplify (Seconds (2*seconds)))
+        assertEqual "1 minute" (prettyPrintLossy $ simplify (Seconds (1*minute + 29*seconds)))
+        assertEqual "2 minutes" (prettyPrintLossy $ simplify (Seconds (1*minute + 30*seconds)))
+        assertEqual "1 hour" (prettyPrintLossy $ simplify (Seconds (1*hour + 29*minutes)))
+        assertEqual "2 hours" (prettyPrintLossy $ simplify (Seconds (1*hour + 30*minutes)))
+        assertEqual "2 days" (prettyPrintLossy $ simplify (Seconds 198719))
         assertEqual "3 days" (prettyPrintLossy $ simplify (Seconds 233280))
+        assertEqual "1 month" (prettyPrintLossy $ simplify (Seconds (1*month + 14*days)))
+        assertEqual "2 months" (prettyPrintLossy $ simplify (Seconds (1*month + 15*days)))
+        assertEqual "1 year" (prettyPrintLossy $ simplify (Seconds (1*year + 5*months)))
+        assertEqual "2 years" (prettyPrintLossy $ simplify (Seconds (1*year + 6*months)))
+        assertEqual "2 years, 1 month" (prettyPrint $ Main.round $ take 3 $ simplify (Seconds (2*years + 1*month + 14*days)))
      where
+        year = years
+        years = 12*months
+        month = months
+        months = 30*days
+        days = 24*hours
+        hour = hours
+        hours = 60*minutes
+        minute = minutes
+        minutes = 60*seconds
+        second = seconds
+        seconds = 1
         prettyPrintLossy ts = prettyPrint $ Main.round $ take 2 ts
 
 data Timespan = Seconds Integer |
@@ -107,10 +129,23 @@ simplifyL [(Seconds seconds)]
 simplifyL ts     = ts
 
 round :: [Timespan] -> [Timespan]
+round [(Years y), (Months m)]
+  | m < 6 = [(Years y)]
+  | otherwise = [(Years (y+1))]
+round [(Months m), (Days d)]
+  | d < 15 = [(Months m)]
+  | otherwise = [(Months (m+1))]
 round [(Days d), (Hours h)]
   | h < 12 = [(Days d)]
   | otherwise = [(Days (d+1))]
-round ts = ts
+round [(Hours h), (Minutes m)]
+  | m < 30 = [(Hours h)]
+  | otherwise = [(Hours (h+1))]
+round [(Minutes m), (Seconds s)]
+  | s < 30 = [(Minutes m)]
+  | otherwise = [(Minutes (m+1))]
+round [(Seconds s)] = [(Seconds s)]
+round (t:ts) = (t:(Main.round ts))
 
 
 main =
