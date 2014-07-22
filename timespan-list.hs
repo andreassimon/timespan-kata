@@ -127,21 +127,16 @@ simplify (Seconds seconds) = simplifyL [Seconds seconds]
 
 simplifyL :: [Timespan] -> [Timespan]
 simplifyL ((Months months):ts)
-  | months < 12  = (Months months):ts
-  | otherwise    = simplifyL $ (Years (months `div` 12)):(Months (months `mod` 12)):ts
+  | months >= 12  = simplifyL $ (Years (months `div` 12)):(Months (months `mod` 12)):ts
 simplifyL ((Days days):ts)
-  | days < 30    = (Days days):ts
-  | otherwise    = simplifyL $ (Months (days `div` 30)):(Days (days `mod` 30)):ts
+  | days >= 30    = simplifyL $ (Months (days `div` 30)):(Days (days `mod` 30)):ts
 simplifyL ((Hours hours):ts)
-  | hours < 24   = (Hours hours):ts
-  | otherwise    = simplifyL $ (Days (hours `div` 24)):(Hours (hours `mod` 24)):ts
+  | hours >= 24   = simplifyL $ (Days (hours `div` 24)):(Hours (hours `mod` 24)):ts
 simplifyL ((Minutes minutes):ts)
-  | minutes < 60 = (Minutes minutes):ts
-  | otherwise    = simplifyL $ (Hours (minutes `div` 60)):(Minutes (minutes `mod` 60)):ts
+  | minutes >= 60 = simplifyL $ (Hours (minutes `div` 60)):(Minutes (minutes `mod` 60)):ts
 simplifyL [(Seconds seconds)]
-  | seconds < 60 = [(Seconds seconds)]
-  | otherwise    = simplifyL [(Minutes (seconds `div` 60)), (Seconds (seconds `mod` 60))]
-simplifyL ts     = ts
+  | seconds >= 60 = simplifyL [(Minutes (seconds `div` 60)), (Seconds (seconds `mod` 60))]
+simplifyL ts      = ts
 
 data RoundedTimespan = Floor [Timespan] |
                        Ceiling [Timespan] |
